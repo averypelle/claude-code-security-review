@@ -322,10 +322,11 @@ class SimpleClaudeRunner:
             )
             
             if result.returncode == 0:
-                # Also check if API key is configured
+                # Check if authentication is configured (OAuth token or API key)
+                oauth_token = os.environ.get('CLAUDE_CODE_OAUTH_TOKEN', '')
                 api_key = os.environ.get('ANTHROPIC_API_KEY', '')
-                if not api_key:
-                    return False, "ANTHROPIC_API_KEY environment variable is not set"
+                if not oauth_token and not api_key:
+                    return False, "Neither CLAUDE_CODE_OAUTH_TOKEN nor ANTHROPIC_API_KEY environment variable is set"
                 return True, ""
             else:
                 error_msg = f"Claude Code returned exit code {result.returncode}"
@@ -395,27 +396,29 @@ def initialize_clients() -> Tuple[GitHubActionClient, SimpleClaudeRunner]:
 
 def initialize_findings_filter(custom_filtering_instructions: Optional[str] = None) -> FindingsFilter:
     """Initialize findings filter based on environment configuration.
-    
+
     Args:
         custom_filtering_instructions: Optional custom filtering instructions
-        
+
     Returns:
         FindingsFilter instance
-        
+
     Raises:
         ConfigurationError: If filter initialization fails
     """
     try:
         # Check if we should use Claude API filtering
         use_claude_filtering = os.environ.get('ENABLE_CLAUDE_FILTERING', 'false').lower() == 'true'
+        oauth_token = os.environ.get('CLAUDE_CODE_OAUTH_TOKEN')
         api_key = os.environ.get('ANTHROPIC_API_KEY')
-        
-        if use_claude_filtering and api_key:
+
+        if use_claude_filtering and (oauth_token or api_key):
             # Use full filtering with Claude API
             return FindingsFilter(
                 use_hard_exclusions=True,
                 use_claude_filtering=True,
                 api_key=api_key,
+                oauth_token=oauth_token,
                 custom_filtering_instructions=custom_filtering_instructions
             )
         else:

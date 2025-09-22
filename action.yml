@@ -25,7 +25,12 @@ inputs:
   
   claude-api-key:
     description: 'Anthropic Claude API key for security analysis'
-    required: true
+    required: false
+    default: ''
+
+  claude-code-oauth-token:
+    description: 'Claude Code OAuth token for authentication (alternative to API key)'
+    required: false
     default: ''
 
   claude-model:
@@ -182,6 +187,7 @@ runs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         ANTHROPIC_API_KEY: ${{ inputs.claude-api-key }}
+        CLAUDE_CODE_OAUTH_TOKEN: ${{ inputs.claude-code-oauth-token }}
         ENABLE_CLAUDE_FILTERING: 'true' 
         EXCLUDE_DIRECTORIES: ${{ inputs.exclude-directories }}
         FALSE_POSITIVE_FILTERING_INSTRUCTIONS: ${{ inputs.false-positive-filtering-instructions }}
@@ -203,13 +209,17 @@ runs:
           exit 0
         fi
         
-        # Validate API key is provided
-        if [ -z "$ANTHROPIC_API_KEY" ]; then
-          echo "::error::ANTHROPIC_API_KEY is not set. Please provide the claude-api-key input to the action."
-          echo "Example usage:"
+        # Validate authentication is provided (either API key or OAuth token)
+        if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+          echo "::error::No authentication provided. Please provide either claude-api-key or claude-code-oauth-token input to the action."
+          echo "Example usage with API key:"
           echo "  - uses: anthropics/claude-code-security-reviewer@main"
           echo "    with:"
           echo "      claude-api-key: \$\{{ secrets.ANTHROPIC_API_KEY }}"
+          echo "Example usage with OAuth token:"
+          echo "  - uses: anthropics/claude-code-security-reviewer@main"
+          echo "    with:"
+          echo "      claude-code-oauth-token: \$\{{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}"
           exit 1
         fi
                 
