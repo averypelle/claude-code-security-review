@@ -235,7 +235,13 @@ runs:
         echo "Current directory: $(pwd)"
         echo "Python version: $(python --version)"
         echo "Claude CLI version: $(claude --version 2>&1 || echo 'Claude CLI not found')"
-        echo "ANTHROPIC_API_KEY set: $(if [ -n "$ANTHROPIC_API_KEY" ]; then echo 'Yes'; else echo 'No'; fi)"
+        if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+          echo "Authentication method: OAuth token"
+        elif [ -n "$ANTHROPIC_API_KEY" ]; then
+          echo "Authentication method: API key"
+        else
+          echo "Authentication method: None (this will cause an error)"
+        fi
         echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
         echo "PR_NUMBER: $PR_NUMBER"
         echo "Python path: $PYTHONPATH"
