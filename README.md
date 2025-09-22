@@ -77,6 +77,12 @@ Choose one of the following authentication methods:
     claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 ```
 
+To get an OAuth token, Pro and Max users can run:
+```bash
+claude setup-token
+```
+Then add the generated token to your repository secrets as `CLAUDE_CODE_OAUTH_TOKEN`.
+
 **Option 2: API Key**
 ```yaml
 - uses: anthropics/claude-code-security-review@main
