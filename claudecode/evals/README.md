@@ -15,7 +15,7 @@ The evaluation tool allows you to run the Claude Code Security Reviewer on any G
 - Git 2.20+ (for worktree support)
 - GitHub CLI (`gh`) for API access
 - Environment variables:
-  - `ANTHROPIC_API_KEY`: Required for Claude API access
+  - `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY`: Required for authentication
   - `GITHUB_TOKEN`: Recommended for GitHub API rate limits
 
 ## Usage
